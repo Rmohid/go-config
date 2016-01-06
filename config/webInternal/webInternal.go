@@ -17,7 +17,7 @@ func Run() {
 	serverInternal.HandleFunc("/key/", handleGetKey)
 	serverInternal.HandleFunc("/json", handleGetJson)
 	serverInternal.HandleFunc("/JSON", handleGetJson)
-	log.Fatal("webInternal.Run(): ", http.ListenAndServe(data.Get("config.portInternal"), serverInternal))
+	log.Fatal("webInternal.Run(): ", http.ListenAndServe(data.Get("config.port"), serverInternal))
 }
 
 func handler(w http.ResponseWriter, r *http.Request) {

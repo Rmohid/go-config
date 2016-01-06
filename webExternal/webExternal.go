@@ -13,7 +13,7 @@ import (
 func Run() {
 	serverExternal := http.NewServeMux()
 	serverExternal.HandleFunc("/", handler)
-	log.Fatal(http.ListenAndServe(config.Get("portExternal"), serverExternal))
+	log.Fatal(http.ListenAndServe(config.Get("port"), serverExternal))
 }
 
 func handler(w http.ResponseWriter, r *http.Request) {

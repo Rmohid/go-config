@@ -32,8 +32,7 @@ func init() {
 
 	// default options for config package
 	opts := [][]string{
-		{"config.portInternal", "localhost:7100", "internal api web port"},
-		{"config.silentWebPrompt", "no", "display internal port used"},
+		{"config.port", "localhost:7100", "internal api web port"},
 		{"config.readableJson", "yes", "pretty print api json output"},
 		{"config.enableFlagParse", "yes", "allow config to flag.Parse()"},
 	}
@@ -101,10 +100,8 @@ func ParseArgs(inOpts [][]string) error {
 	}
 
 	// Start the internal admin web interface
-	if Get("config.portInternal") != "" {
-		if Get("config.silentWebPrompt") == "no" {
-			fmt.Println("configuration on", Get("config.portInternal"))
-		}
+	if Get("dbg.verbosity") != "0" {
+		fmt.Println("configuration on", Get("config.port"))
 		go webInternal.Run()
 	}
 	return nil
