@@ -69,7 +69,7 @@ func handlePostJson(w http.ResponseWriter, r *http.Request) {
 	if err != nil {
 		log.Print(err)
 	}
-	d.Replace(newkv)
+	d.Update(newkv)
 }
 func handleDelete(w http.ResponseWriter, r *http.Request) {
 	if err := r.ParseForm(); err != nil {

@@ -55,8 +55,8 @@ func Exists(k string) bool {
 func Keys() []string {
 	return d.Keys()
 }
-func Replace(newkv map[string]string) {
-	d.Replace(newkv)
+func Clear(){
+	d.Clear()
 }
 func Dump() []string {
 	var out []string
@@ -103,6 +103,8 @@ func ParseArgs(inOpts [][]string) error {
 	// Start the internal admin web interface
 	if Get("dbg.verbosity") != "0" {
 		fmt.Println("configuration on", Get("config.port"))
+	}
+	if Get("config.port") != "" {
 		go webInternal.Run()
 	}
 	return nil

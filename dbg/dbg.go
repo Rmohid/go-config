@@ -19,12 +19,12 @@ var (
 )
 
 func init() {
-	writers[""] = devnull()
-	writers["devnull"] = devnull()
+	writers[""] = makeDevnull()
+	writers["devnull"] = makeDevnull()
 	writers["stdout"] = os.Stdout
 	writers["stderr"] = os.Stderr
-	writers["http"] = httpwriter()
-	writers["file"] = filewriter()
+	writers["http"] = makeHttpWriter()
+	writers["file"] = makeFileWriter()
 
 	// define all default options
 	var opts = [][]string{
@@ -55,7 +55,7 @@ func Log(verbosity int, a ...interface{}) {
 			a...)
 	}
 }
-func devnull() io.Writer {
+func makeDevnull() io.Writer {
 	null, err := os.Open(os.DevNull)
 	if err != nil {
 		log.Fatal("dbg.devnull:", err)
@@ -63,9 +63,8 @@ func devnull() io.Writer {
 	return null
 }
 
-func httpwriter() io.Writer {
-	var h httpWriter
-	return h
+func makeHttpWriter() io.Writer {
+	return new(httpWriter)
 }
 
 type httpWriter struct {
@@ -77,7 +76,8 @@ func (h httpWriter) Write(p []byte) (n int, err error) {
 		return 0, nil
 	}
 	payload := fmt.Sprintf(string(p[:]))
-	str = fmt.Sprintf("http://%s?%s=%s", str, time.Now().Format("2006-01-02T15:04:05.999Z07:00"), url.QueryEscape(payload))
+        t := time.Now().String()
+	str = fmt.Sprintf("http://%s?%s=%s", str, url.QueryEscape(t), url.QueryEscape(payload))
 	resp, err := http.Get(str)
 	if err != nil {
 		return 0, fmt.Errorf("dbg.httpWriter:", err)
@@ -86,9 +86,8 @@ func (h httpWriter) Write(p []byte) (n int, err error) {
 	return 0, nil
 }
 
-func filewriter() io.Writer {
-	var h fileWriter
-	return h
+func makeFileWriter() io.Writer {
+	return new(fileWriter)
 }
 
 type fileWriter struct {

@@ -36,8 +36,7 @@ type testkeys struct {
 }
 
 func resetData() {
-	var newdata = make(map[string]string)
-	Replace(newdata)
+	Clear()
 }
 func testEq(a, b []string) bool {
 	if a == nil || b == nil {

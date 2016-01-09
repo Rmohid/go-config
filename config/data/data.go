@@ -20,7 +20,8 @@ type KvData interface {
 	Get(k string) string
 	Exists(k string) bool
 	Keys() []string
-	Replace(newkv map[string]string)
+	Clear()
+	Update(newkv map[string]string)
 }
 
 type NaiveKv struct {
@@ -74,9 +75,17 @@ func (d *NaiveKv) Keys() []string {
 	sort.Strings(list)
 	return list
 }
-func (d *NaiveKv) Replace(newkv map[string]string) {
+func (d *NaiveKv) Clear() {
 	mu.Lock()
 	defer mu.Unlock()
-	// take old reference and garbage collect memory
+        newkv := make(map[string]string)
+	// orphan old reference and garbage collect memory
 	data = newkv
+}
+func (d *NaiveKv) Update(newkv map[string]string) {
+	mu.Lock()
+	defer mu.Unlock()
+	for k,v := range newkv {
+                data[k] = v
+	}
 }

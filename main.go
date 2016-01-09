@@ -35,7 +35,7 @@ func main() {
 
 func test() {
 	for {
-		time.Sleep(1 * time.Second)
+		time.Sleep(3 * time.Second)
 		dbg.Log(2, "Debug log ", time.Now().Format(time.StampMilli))
 	}
 }
