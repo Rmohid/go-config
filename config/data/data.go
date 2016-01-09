@@ -10,21 +10,42 @@ import (
 var (
 	data map[string]string
 	mu   sync.Mutex
+        d    KvData
 )
+
+type KvData interface {
+	GetData() *map[string]string
+	Delete(k string)
+	Set(k, v string)
+	Get(k string) string
+	Exists(k string) bool
+	Keys() []string
+	Replace(newkv map[string]string)
+}
+
+type NaiveKv struct {
+}
 
 func init() {
 	data = make(map[string]string)
+        d = new(NaiveKv)
+}
+func New() KvData {
+	return d
+}
+func SwapKvStore(newKvStore KvData) {
+        d = newKvStore
 }
 
-func GetData() *map[string]string {
+func (d *NaiveKv) GetData() *map[string]string {
 	return &data
 }
-func Delete(k string) {
+func (d *NaiveKv) Delete(k string) {
 	mu.Lock()
 	defer mu.Unlock()
 	delete(data, k)
 }
-func Set(k, v string) {
+func (d *NaiveKv) Set(k, v string) {
 	mu.Lock()
 	defer mu.Unlock()
 	if k == "" {
@@ -32,18 +53,18 @@ func Set(k, v string) {
 	}
 	data[k] = v
 }
-func Get(k string) string {
+func (d *NaiveKv) Get(k string) string {
 	mu.Lock()
 	defer mu.Unlock()
 	return data[k]
 }
-func Exists(k string) bool {
+func (d *NaiveKv) Exists(k string) bool {
 	mu.Lock()
 	defer mu.Unlock()
 	_, ok := data[k]
 	return ok
 }
-func Keys() []string {
+func (d *NaiveKv) Keys() []string {
 	mu.Lock()
 	defer mu.Unlock()
 	list := make([]string, 0, len(data))
@@ -53,7 +74,7 @@ func Keys() []string {
 	sort.Strings(list)
 	return list
 }
-func Replace(newkv map[string]string) {
+func (d *NaiveKv) Replace(newkv map[string]string) {
 	mu.Lock()
 	defer mu.Unlock()
 	// take old reference and garbage collect memory

@@ -25,6 +25,7 @@ const (
 var (
 	mu      sync.Mutex
 	indexed map[string]*Option
+	d       = data.New()
 )
 
 func init() {
@@ -40,22 +41,22 @@ func init() {
 	PushArgs(opts)
 }
 func Delete(k string) {
-	data.Delete(k)
+	d.Delete(k)
 }
 func Set(k, v string) {
-	data.Set(k, v)
+	d.Set(k, v)
 }
 func Get(k string) string {
-	return data.Get(k)
+	return d.Get(k)
 }
 func Exists(k string) bool {
-	return data.Exists(k)
+	return d.Exists(k)
 }
 func Keys() []string {
-	return data.Keys()
+	return d.Keys()
 }
 func Replace(newkv map[string]string) {
-	data.Replace(newkv)
+	d.Replace(newkv)
 }
 func Dump() []string {
 	var out []string
@@ -77,7 +78,7 @@ func PushArgs(inOpts [][]string) error {
 		if len(inOpts[i]) > 2 {
 			o.Description = inOpts[i][DescriptionIdx]
 		}
-		data.Set(o.Name, o.Default)
+		d.Set(o.Name, o.Default)
 		indexed[o.Name] = &o
 	}
 	return nil
@@ -96,7 +97,7 @@ func ParseArgs(inOpts [][]string) error {
 		flag.Parse()
 	}
 	for _, elem := range indexed {
-		data.Set(elem.Name, *elem.Value)
+		d.Set(elem.Name, *elem.Value)
 	}
 
 	// Start the internal admin web interface

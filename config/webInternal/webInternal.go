@@ -11,13 +11,15 @@ import (
 	"strings"
 )
 
+var d = data.New()
+
 func Run() {
 	serverInternal := http.NewServeMux()
 	serverInternal.HandleFunc("/", handler)
 	serverInternal.HandleFunc("/key/", handleGetKey)
 	serverInternal.HandleFunc("/json", handleGetJson)
 	serverInternal.HandleFunc("/JSON", handleGetJson)
-	log.Fatal("webInternal.Run(): ", http.ListenAndServe(data.Get("config.port"), serverInternal))
+	log.Fatal("webInternal.Run(): ", http.ListenAndServe(d.Get("config.port"), serverInternal))
 }
 
 func handler(w http.ResponseWriter, r *http.Request) {
@@ -41,19 +43,19 @@ func handleGet(w http.ResponseWriter, r *http.Request) {
 	}
 	if len(r.Form) > 0 {
 		for k, v := range r.Form {
-			data.Set(k, strings.Join(v, " "))
+			d.Set(k, strings.Join(v, " "))
 		}
 	} else {
-		configKeys := data.Keys()
+		configKeys := d.Keys()
 		for _, k := range configKeys {
-			fmt.Fprintf(w, "Config[%q] = %q\n", k, data.Get(k))
+			fmt.Fprintf(w, "Config[%q] = %q\n", k, d.Get(k))
 		}
 	}
 }
 func handleGetJson(w http.ResponseWriter, r *http.Request) {
-	dat, err := json.Marshal(data.GetData())
-	if data.Get("config.readableJson") == "yes" {
-		dat, err = json.MarshalIndent(data.GetData(), "", "  ")
+	dat, err := json.Marshal(d.GetData())
+	if d.Get("config.readableJson") == "yes" {
+		dat, err = json.MarshalIndent(d.GetData(), "", "  ")
 	}
 	if err != nil {
 		log.Print(err)
@@ -67,7 +69,7 @@ func handlePostJson(w http.ResponseWriter, r *http.Request) {
 	if err != nil {
 		log.Print(err)
 	}
-	data.Replace(newkv)
+	d.Replace(newkv)
 }
 func handleDelete(w http.ResponseWriter, r *http.Request) {
 	if err := r.ParseForm(); err != nil {
@@ -75,13 +77,13 @@ func handleDelete(w http.ResponseWriter, r *http.Request) {
 	}
 	if len(r.Form) > 0 {
 		for k, _ := range r.Form {
-			data.Delete(k)
+			d.Delete(k)
 		}
 	}
 }
 func handleGetKey(w http.ResponseWriter, r *http.Request) {
 	var i = strings.LastIndex(r.URL.Path, "/key/") + len("/key/")
 	if i > 0 {
-		fmt.Fprintf(w, "%s\n", data.Get(r.URL.Path[i:]))
+		fmt.Fprintf(w, "%s\n", d.Get(r.URL.Path[i:]))
 	}
 }

@@ -37,7 +37,7 @@ type testkeys struct {
 
 func resetData() {
 	var newdata = make(map[string]string)
-	Replace(newdata)
+	d.Replace(newdata)
 }
 func testEq(a, b []string) bool {
 	if a == nil || b == nil {
@@ -55,7 +55,7 @@ func testEq(a, b []string) bool {
 }
 func loadSlice(a []string) {
 	for i := range a {
-		Set(a[i], a[i])
+		d.Set(a[i], a[i])
 	}
 }
 func TestGet(t *testing.T) {
@@ -66,7 +66,7 @@ func TestGet(t *testing.T) {
 		{"portInternal", ""},
 	}
 	for _, pair := range tests {
-		v := Get(pair.value)
+		v := d.Get(pair.value)
 		if v != pair.expect {
 			t.Error(
 				"For", pair.value,
@@ -85,8 +85,8 @@ func TestSet(t *testing.T) {
 		{"foo", "", ""},
 	}
 	for _, pair := range tests {
-		Set(pair.key, pair.value)
-		v := Get(pair.key)
+		d.Set(pair.key, pair.value)
+		v := d.Get(pair.key)
 		if v != pair.expect {
 			t.Error(
 				"For", pair.key, pair.value,
@@ -101,22 +101,22 @@ func TestDelete(t *testing.T) {
 	var key, value, expect string
 	for {
 		key, value, expect = "missing", "", ""
-		Delete(key)
-		value = Get(key)
+		d.Delete(key)
+		value = d.Get(key)
 		if value != expect {
 			break
 		}
 		key, value, expect = "foo", "bar", ""
-		Set(key, value)
-		Delete(key)
-		value = Get(key)
+		d.Set(key, value)
+		d.Delete(key)
+		value = d.Get(key)
 		if value != expect {
 			break
 		}
 		key, value, expect = "fOo", "bar", ""
-		Set(key, value)
-		Delete(key)
-		value = Get(key)
+		d.Set(key, value)
+		d.Delete(key)
+		value = d.Get(key)
 		if value != expect {
 			break
 		}
@@ -139,9 +139,9 @@ func TestExists(t *testing.T) {
 	}
 	for _, pair := range tests {
 		if pair.expect {
-			Set(pair.key, pair.value)
+			d.Set(pair.key, pair.value)
 		}
-		v := Exists(pair.key)
+		v := d.Exists(pair.key)
 		if v != pair.expect {
 			t.Error(
 				"For", pair.key, pair.value,
@@ -160,7 +160,7 @@ func TestKeys(t *testing.T) {
 	}
 	for _, set := range tests {
 		loadSlice(set.inkeys)
-		set.outkeys = Keys()
+		set.outkeys = d.Keys()
 		if true != testEq(set.outkeys, set.expect) {
 			t.Error(
 				"For", set.inkeys,
