@@ -18,7 +18,7 @@ func Run() {
 	serverInternal.HandleFunc("/", handler)
 	serverInternal.HandleFunc("/key/", handleGetKey)
 	serverInternal.HandleFunc("/json", handleGetJson)
-	serverInternal.HandleFunc("/JSON", handleGetJson)
+	serverInternal.HandleFunc("/kv/reset", handleKvReset)
 	log.Fatal("webInternal.Run(): ", http.ListenAndServe(d.Get("config.port"), serverInternal))
 }
 
@@ -86,4 +86,7 @@ func handleGetKey(w http.ResponseWriter, r *http.Request) {
 	if i > 0 {
 		fmt.Fprintf(w, "%s\n", d.Get(r.URL.Path[i:]))
 	}
+}
+func handleKvReset(w http.ResponseWriter, r *http.Request) {
+        d.Clear()
 }
