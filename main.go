@@ -4,11 +4,12 @@ package main
 
 import (
 	"fmt"
-	"github.com/rmohid/go-template/config"
-	"github.com/rmohid/go-template/dbg"
-	"github.com/rmohid/go-template/webExternal"
 	"os"
 	"time"
+
+	"github.com/rmohid/go-config/config"
+	"github.com/rmohid/go-config/dbg"
+	"github.com/rmohid/go-config/webExternal"
 )
 
 var err error
@@ -27,7 +28,7 @@ func main() {
 	}
 
 	dbg.Log(2, config.Dump())
-	dbg.Log(0,"listening on", config.Get("port"))
+	dbg.Log(0, "listening on", config.Get("port"))
 
 	go test()
 	webExternal.Run()

@@ -5,10 +5,11 @@ package webInternal
 import (
 	"encoding/json"
 	"fmt"
-	"github.com/rmohid/go-template/config/data"
 	"log"
 	"net/http"
 	"strings"
+
+	"github.com/rmohid/go-config/config/data"
 )
 
 var d = data.New()
@@ -88,5 +89,5 @@ func handleGetKey(w http.ResponseWriter, r *http.Request) {
 	}
 }
 func handleKvReset(w http.ResponseWriter, r *http.Request) {
-        d.Clear()
+	d.Clear()
 }

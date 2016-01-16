@@ -4,10 +4,11 @@ package webExternal
 
 import (
 	"fmt"
-	"github.com/rmohid/go-template/config"
-	"github.com/rmohid/go-template/dbg"
 	"log"
 	"net/http"
+
+	"github.com/rmohid/go-config/config"
+	"github.com/rmohid/go-config/dbg"
 )
 
 func Run() {

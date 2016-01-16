@@ -4,7 +4,6 @@ package dbg
 
 import (
 	"fmt"
-	"github.com/rmohid/go-template/config"
 	"io"
 	"log"
 	"net/http"
@@ -12,6 +11,8 @@ import (
 	"os"
 	"strconv"
 	"time"
+
+	"github.com/rmohid/go-config/config"
 )
 
 var (
@@ -76,7 +77,7 @@ func (h httpWriter) Write(p []byte) (n int, err error) {
 		return 0, nil
 	}
 	payload := fmt.Sprintf(string(p[:]))
-        t := time.Now().String()
+	t := time.Now().String()
 	str = fmt.Sprintf("http://%s?%s=%s", str, url.QueryEscape(t), url.QueryEscape(payload))
 	resp, err := http.Get(str)
 	if err != nil {

@@ -1,14 +1,18 @@
 // Key value web api for configuration data
-// See github.com/rmohid/go-template for detailed description
+// See github.com/rmohid/go-config for detailed description
 
 package config
 
 import (
+	"encoding/json"
 	"flag"
 	"fmt"
-	"github.com/rmohid/go-template/config/data"
-	"github.com/rmohid/go-template/config/webInternal"
+	"io/ioutil"
+	"os"
 	"sync"
+
+	"github.com/rmohid/go-config/config/data"
+	"github.com/rmohid/go-config/config/webInternal"
 )
 
 type Option struct {
@@ -38,6 +42,7 @@ func init() {
 		{"config.enableFlagParse", "yes", "allow config to flag.Parse()"},
 	}
 
+	loadConfigFile()
 	PushArgs(opts)
 }
 func Delete(k string) {
@@ -55,7 +60,7 @@ func Exists(k string) bool {
 func Keys() []string {
 	return d.Keys()
 }
-func Clear(){
+func Clear() {
 	d.Clear()
 }
 func Dump() []string {
@@ -67,6 +72,10 @@ func Dump() []string {
 	return out
 }
 func PushArgs(inOpts [][]string) error {
+	// can't use default options if using config file
+	if d.Exists("config.file") {
+		return nil
+	}
 	mu.Lock()
 	defer mu.Unlock()
 	for i, _ := range inOpts {
@@ -108,4 +117,21 @@ func ParseArgs(inOpts [][]string) error {
 		go webInternal.Run()
 	}
 	return nil
+}
+func loadConfigFile() {
+	var newkv = make(map[string]string)
+	cfgFile := os.Args[0] + ".json"
+	if configJson, err := ioutil.ReadFile(cfgFile); err == nil {
+		err := json.Unmarshal(configJson, &newkv)
+		if err != nil {
+			fmt.Println(err)
+			os.Exit(1)
+		}
+		// config file overrides internal options
+		d.Set("config.file", cfgFile)
+		for k, v := range newkv {
+			d.Set(k, v)
+		}
+		return
+	}
 }

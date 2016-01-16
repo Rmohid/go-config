@@ -38,17 +38,19 @@ func SwapKvStore(newKvStore KvData) {
 
 type shimKv struct {
 }
-func (s *shimKv) GetData() *map[string]string { return d.GetData() }
-func (s *shimKv) Delete(k string){ d.Delete(k) }
-func (s *shimKv) Set(k, v string){ d.Set(k,v) }
-func (s *shimKv) Get(k string) string{ return d.Get(k) }
-func (s *shimKv) Exists(k string) bool{ return d.Exists(k) }
-func (s *shimKv) Keys() []string{ return d.Keys() }
-func (s *shimKv) Clear(){ d.Clear() }
-func (s *shimKv) Update(newkv map[string]string){ d.Update(newkv) }
+
+func (s *shimKv) GetData() *map[string]string    { return d.GetData() }
+func (s *shimKv) Delete(k string)                { d.Delete(k) }
+func (s *shimKv) Set(k, v string)                { d.Set(k, v) }
+func (s *shimKv) Get(k string) string            { return d.Get(k) }
+func (s *shimKv) Exists(k string) bool           { return d.Exists(k) }
+func (s *shimKv) Keys() []string                 { return d.Keys() }
+func (s *shimKv) Clear()                         { d.Clear() }
+func (s *shimKv) Update(newkv map[string]string) { d.Update(newkv) }
 
 type naiveKv struct {
 }
+
 func (d *naiveKv) GetData() *map[string]string {
 	return &data
 }
