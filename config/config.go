@@ -27,22 +27,23 @@ const (
 )
 
 var (
-	mu      sync.Mutex
-	indexed map[string]*Option
-	d       = data.New()
+	wg       sync.WaitGroup
+	d        = data.New()
+	indexed  = make(map[string]*Option)
+	argsIn   = make(chan Option)
+	argsDone = make(chan bool)
 )
 
 func init() {
-	indexed = make(map[string]*Option)
-
 	// default options for config package
 	opts := [][]string{
-		{"config.port", "localhost:7100", "internal api web port"},
+		{"config.port", "7100", "internal api web port"},
+		{"config.file", os.Args[0] + ".json", "configuration file to use"},
 		{"config.readableJson", "yes", "pretty print api json output"},
 		{"config.enableFlagParse", "yes", "allow config to flag.Parse()"},
 	}
 
-	loadConfigFile()
+	go argConsumer()
 	PushArgs(opts)
 }
 func Delete(k string) {
@@ -72,33 +73,26 @@ func Dump() []string {
 	return out
 }
 func PushArgs(inOpts [][]string) error {
-	// can't use default options if using config file
-	if d.Exists("config.file") {
-		return nil
-	}
-	mu.Lock()
-	defer mu.Unlock()
 	for i, _ := range inOpts {
 		var o Option
-		if v, ok := indexed[inOpts[i][NameIdx]]; ok == true {
-			o = *v
-		}
 		o.Name, o.Default = inOpts[i][NameIdx], inOpts[i][DefaultIdx]
 		if len(inOpts[i]) > 2 {
 			o.Description = inOpts[i][DescriptionIdx]
 		}
-		d.Set(o.Name, o.Default)
-		indexed[o.Name] = &o
+		wg.Add(1)
+		select {
+		case <-argsDone:
+			return nil
+		case argsIn <- o:
+		}
 	}
 	return nil
 }
 func ParseArgs(inOpts [][]string) error {
-
 	PushArgs(inOpts)
-	mu.Lock()
-	defer mu.Unlock()
-	for _, v := range indexed {
-		elem := v
+	wg.Wait()
+	close(argsDone)
+	for _, elem := range indexed {
 		elem.Value = flag.String(elem.Name, elem.Default, elem.Description)
 	}
 	// nothing is actally done until parse is called
@@ -108,10 +102,10 @@ func ParseArgs(inOpts [][]string) error {
 	for _, elem := range indexed {
 		d.Set(elem.Name, *elem.Value)
 	}
-
+	loadConfigFile()
 	// Start the internal admin web interface
 	if Get("dbg.verbosity") != "0" {
-		fmt.Println("configuration on", Get("config.port"))
+		fmt.Println("configuration on", "localhost:"+Get("config.port"))
 	}
 	if Get("config.port") != "" {
 		go webInternal.Run()
@@ -120,18 +114,31 @@ func ParseArgs(inOpts [][]string) error {
 }
 func loadConfigFile() {
 	var newkv = make(map[string]string)
-	cfgFile := os.Args[0] + ".json"
+	cfgFile := d.Get("config.file")
 	if configJson, err := ioutil.ReadFile(cfgFile); err == nil {
 		err := json.Unmarshal(configJson, &newkv)
 		if err != nil {
 			fmt.Println(err)
 			os.Exit(1)
 		}
-		// config file overrides internal options
-		d.Set("config.file", cfgFile)
 		for k, v := range newkv {
 			d.Set(k, v)
 		}
 		return
+	}
+}
+func argConsumer() {
+	for {
+		select {
+		case <-argsDone:
+			return
+		case o := <-argsIn:
+			wg.Done()
+			if v, ok := indexed[o.Name]; ok == true {
+				o.Description = (*v).Description
+			}
+			d.Set(o.Name, o.Default)
+			indexed[o.Name] = &o
+		}
 	}
 }
