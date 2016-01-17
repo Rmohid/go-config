@@ -29,7 +29,7 @@ func init() {
 
 	// define all default options
 	var opts = [][]string{
-		{"dbg.debugWriter", "stderr", "debug log output sink"},
+		{"dbg.debugWriter", "stderr", "debug log output sink (stdout|stderr|http|file)"},
 		{"dbg.verbosity", "0", "verbosity level for debug output"},
 		{"dbg.logfile", "config.log", "filename for log collection"},
 		{"dbg.httpUrl", "", "http server for log delivery"},

@@ -46,6 +46,21 @@ func init() {
 	go argConsumer()
 	PushArgs(opts)
 }
+func argConsumer() {
+	for {
+		select {
+		case <-argsDone:
+			return
+		case o := <-argsIn:
+			wg.Done()
+			if v, ok := indexed[o.Name]; ok == true {
+				o.Description = (*v).Description
+			}
+			d.Set(o.Name, o.Default)
+			indexed[o.Name] = &o
+		}
+	}
+}
 func Delete(k string) {
 	d.Delete(k)
 }
@@ -73,6 +88,7 @@ func Dump() []string {
 	return out
 }
 func PushArgs(inOpts [][]string) error {
+	wg.Wait()
 	for i, _ := range inOpts {
 		var o Option
 		o.Name, o.Default = inOpts[i][NameIdx], inOpts[i][DefaultIdx]
@@ -125,20 +141,5 @@ func loadConfigFile() {
 			d.Set(k, v)
 		}
 		return
-	}
-}
-func argConsumer() {
-	for {
-		select {
-		case <-argsDone:
-			return
-		case o := <-argsIn:
-			wg.Done()
-			if v, ok := indexed[o.Name]; ok == true {
-				o.Description = (*v).Description
-			}
-			d.Set(o.Name, o.Default)
-			indexed[o.Name] = &o
-		}
 	}
 }
