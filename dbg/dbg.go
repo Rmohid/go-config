@@ -29,10 +29,10 @@ func init() {
 
 	// define all default options
 	var opts = [][]string{
-		{"dbg.debugWriter", "stderr", "debug log output sink"},
+		{"dbg.debugWriter", "stderr", "debug log output sink, one of [stderr,stdout,http]"},
 		{"dbg.verbosity", "0", "verbosity level for debug output"},
 		{"dbg.logfile", "config.log", "filename for log collection"},
-		{"dbg.httpUrl", "", "http server for log delivery"},
+		{"dbg.httpUrl", "", "http server for log delivery via http GET"},
 	}
 
 	config.PushArgs(opts)
@@ -71,14 +71,20 @@ func makeHttpWriter() io.Writer {
 type httpWriter struct {
 }
 
+func must(i string, err error) string {
+	if err != nil {
+		panic(err)
+	}
+	return i
+}
 func (h httpWriter) Write(p []byte) (n int, err error) {
 	str := config.Get("dbg.httpUrl")
 	if str == "" {
 		return 0, nil
 	}
 	payload := fmt.Sprintf(string(p[:]))
-	t := time.Now().String()
-	str = fmt.Sprintf("http://%s?%s=%s", str, url.QueryEscape(t), url.QueryEscape(payload))
+	k := fmt.Sprintf("%v:%v:%v ", must(os.Hostname()), os.Getpid(), time.Now().UnixNano())
+	str = fmt.Sprintf("http://%s?%s=%s", str, url.QueryEscape(k), url.QueryEscape(payload))
 	resp, err := http.Get(str)
 	if err != nil {
 		return 0, fmt.Errorf("dbg.httpWriter:", err)
