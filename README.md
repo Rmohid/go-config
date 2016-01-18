@@ -14,7 +14,7 @@ This is a command-line application template that contains a simple key value sto
 5. Update kv store from JSON
   * curl -H "Content-Type: application/json" --data @kvdata.json http://localhost:7100
 6. Update kv store from config file (by default looks for $0.json)
-  * echo "{ foo:bar }" > somefile.json ; ./go-config -config.file somefile.json
+  * echo '{ foo:"bar" }' > somefile.json ; ./go-config -config.file somefile.json
 7. Save current k/v store to file
   * curl localhost:7100?config.file=somefile.json ; curl localhost:7100/save
 8. Delete individual key values

@@ -82,19 +82,16 @@ func handleGet(w http.ResponseWriter, r *http.Request) {
 func handleGetUsage(w http.ResponseWriter, r *http.Request) {
 	getFmt := "\t%-10s %s\n"
 	postFmt := "\t%-5s %-20s %s\n"
-	fmt.Fprintln(w, "\nGET request handlers:")
+	fmt.Fprintln(w, "GET request handlers:")
 	fmt.Fprintf(w, getFmt, "Path", "Description")
 	for _, h := range getHandlers {
 		fmt.Fprintf(w, getFmt, h.Path, h.Description)
 	}
 	fmt.Fprintln(w, "\nPOST request handlers:")
-	fmt.Fprintf(w, postFmt, "Path", "Meta", "Description")
+	fmt.Fprintf(w, postFmt, "Path", "Content-Type", "Description")
 	for _, h := range postHandlers {
 		fmt.Fprintf(w, postFmt, h.Path, h.Meta, h.Description)
 	}
-	fmt.Fprintln(w, "\nCommand line flag usage:\n")
-	flag.CommandLine.SetOutput(w)
-	flag.CommandLine.PrintDefaults()
 }
 func handleGetJson(w http.ResponseWriter, r *http.Request) {
 	dat, err := json.Marshal(d.GetData())
@@ -131,7 +128,13 @@ func handleDelete(w http.ResponseWriter, r *http.Request) {
 func handleGetKey(w http.ResponseWriter, r *http.Request) {
 	var i = strings.LastIndex(r.URL.Path, "/key/") + len("/key/")
 	if i > 0 {
-		fmt.Fprintf(w, "%s\n", d.Get(r.URL.Path[i:]))
+		if d.Exists(r.URL.Path[i:]) {
+			fmt.Fprintf(w, "%s\n", d.Get(r.URL.Path[i:]))
+		} else {
+			fmt.Fprintln(w, "Flag/Key list:\n")
+			flag.CommandLine.SetOutput(w)
+			flag.CommandLine.PrintDefaults()
+		}
 	}
 }
 func handleKvReset(w http.ResponseWriter, r *http.Request) {
