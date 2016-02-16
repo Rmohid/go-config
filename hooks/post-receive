@@ -4,7 +4,7 @@ set -xe
 work=/var/www/kosh.duckdns.org/$app
 cd $work
 export PATH=$PATH:/usr/local/go/bin
-export GOPATH=$work/vendor
+export GOPATH=$work/dep
 GO15VENDOREXPERIMENT=1 CGO_ENABLED=0 GOOS=linux go build -a -installsuffix cgo -o $app main.go
 docker build -t $app .
 rm $app
