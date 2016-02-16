@@ -1,0 +1,12 @@
+#! /bin/bash
+
+app=go-config
+set -xe
+cd /var/www/kosh.duckdns.org/go-template
+export PATH=$PATH:/usr/local/go/bin
+CGO_ENABLED=0 GOOS=linux godep go build -a -installsuffix cgo -o $app main.go
+docker build -t $app .
+rm $app
+docker stop $app || true
+docker rm $app || true
+docker run -d -p 430:4430  --name $app $app
