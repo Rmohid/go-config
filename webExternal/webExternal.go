@@ -14,7 +14,7 @@ import (
 func Run() {
 	serverExternal := http.NewServeMux()
 	serverExternal.HandleFunc("/", handler)
-	log.Fatal("webExternal.Run:", http.ListenAndServe("localhost:"+config.Get("port"), serverExternal))
+	log.Fatal("webExternal.Run:", http.ListenAndServe(config.Get("port"), serverExternal))
 }
 
 func handler(w http.ResponseWriter, r *http.Request) {

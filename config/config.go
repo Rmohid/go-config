@@ -37,7 +37,7 @@ var (
 func init() {
 	// default options for config package
 	opts := [][]string{
-		{"config.port", "7100", "internal api web port"},
+		{"config.port", os.Getenv("HOSTNAME")+":7100", "internal api web port"},
 		{"config.file", os.Args[0] + ".json", "configuration file to use"},
 		{"config.readableJson", "yes", "pretty print api json output"},
 		{"config.enableFlagParse", "yes", "allow config to flag.Parse()"},
@@ -121,7 +121,7 @@ func ParseArgs(inOpts [][]string) error {
 	loadConfigFile()
 	// Start the internal admin web interface
 	if Get("dbg.verbosity") != "0" {
-		fmt.Println("configuration on", "localhost:"+Get("config.port"))
+		fmt.Println("configuration on", Get("config.port"))
 	}
 	if Get("config.port") != "" {
 		go webInternal.Run()

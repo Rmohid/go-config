@@ -45,7 +45,7 @@ func Run() {
 	for _, h := range getHandlers {
 		serverInternal.HandleFunc(h.Path, h.Handler)
 	}
-	log.Fatal("webInternal.Run(): ", http.ListenAndServe("localhost:"+d.Get("config.port"), serverInternal))
+	log.Fatal("webInternal.Run(): ", http.ListenAndServe(d.Get("config.port"), serverInternal))
 }
 
 func handler(w http.ResponseWriter, r *http.Request) {
