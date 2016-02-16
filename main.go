@@ -18,8 +18,8 @@ func main() {
 
 	// define all string based options
 	var opts = [][]string{
-		{"port", "7000", "external web port"},
-		{"dbg.httpUrl", "localhost:7000"},
+		{"port", os.Getenv("HOSTNAME")+":7000", "external web port"},
+		{"dbg.httpUrl", os.Getenv("HOSTNAME")+":7000"},
 		{"dbg.verbosity", "0"},
 	}
 
@@ -28,7 +28,7 @@ func main() {
 	}
 
 	dbg.Log(2, config.Dump())
-	dbg.Log(0, "listening on", "localhost:"+config.Get("port"))
+	dbg.Log(0, "listening on", config.Get("port"))
 
 	go test()
 	webExternal.Run()
@@ -37,6 +37,6 @@ func main() {
 func test() {
 	for {
 		time.Sleep(3 * time.Second)
-		dbg.Log(2, "Debug log ", time.Now().Format(time.StampMilli))
+		dbg.Log(4, "Debug log ", time.Now().Format(time.StampMilli))
 	}
 }
