@@ -10,4 +10,4 @@ docker build -t $app .
 rm $app
 docker stop $app || true
 docker rm $app || true
-docker run -d -p 430:4430  --name $app $app
+docker run -d -p 7100:7100 -p 7000:7000 --name $app $app
