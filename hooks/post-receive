@@ -1,5 +1,4 @@
 #! /bin/bash
-
 app=go-config
 set -xe
 work=/var/www/kosh.duckdns.org/$app
