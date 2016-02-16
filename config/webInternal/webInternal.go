@@ -51,7 +51,7 @@ func Run() {
 func handler(w http.ResponseWriter, r *http.Request) {
 	switch r.Method {
 	case "GET":
-		handleGetUsage(w, r)
+		handleGet(w, r)
 	case "POST":
 		switch strings.Join(r.Header["Content-Type"], "") {
 		case "application/json":
@@ -73,10 +73,7 @@ func handleGet(w http.ResponseWriter, r *http.Request) {
 			d.Set(k, strings.Join(v, " "))
 		}
 	} else {
-		configKeys := d.Keys()
-		for _, k := range configKeys {
-			fmt.Fprintf(w, "Config[%q] = %q\n", k, d.Get(k))
-		}
+		handleGetUsage(w, r)
 	}
 }
 func handleGetUsage(w http.ResponseWriter, r *http.Request) {
