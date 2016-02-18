@@ -7,10 +7,16 @@ import (
 	"sync"
 )
 
+type Kv struct {
+	data        map[string]string
+	d, shim     KvData
+}
+type KvList struct {
+	list        map[string]Kv
+}
 var (
-	data    map[string]string
-	mu      sync.Mutex
-	d, shim KvData
+	kvlist      KvList
+	mu          sync.Mutex
 )
 
 type KvData interface {
@@ -25,9 +31,8 @@ type KvData interface {
 }
 
 func init() {
-	data = make(map[string]string)
-	d = new(naiveKv)
-	shim = new(shimKv)
+        kvlist = KvList{}
+        kvlist.list[""] = Kv{}
 }
 func New() KvData {
 	return shim
